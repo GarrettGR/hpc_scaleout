@@ -1,0 +1,7 @@
+[
+  {
+    "resource": "${CONFIG_CLUSTER_RESOURCE_NAME}",
+    "resource_type": "HPC",
+    "name": "${CONFIG_CLUSTER_RESOURCE_NAME}"
+  }
+]

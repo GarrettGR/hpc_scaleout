@@ -1,0 +1,13 @@
+apiVersion: 1
+
+datasources:
+  - name: influxdb
+    type: influxdb
+    access: proxy
+    url: http://influxdb:"${CONFIG_SERVICES_INFLUXDB_PORT}"/
+    database: "${CONFIG_CLUSTER_RESOURCE_NAME}"
+    jsonData:
+      httpMode: GET
+      httpHeaderName1: 'Authorization'
+    secureJsonData:
+      httpHeaderValue1: 'Token token'

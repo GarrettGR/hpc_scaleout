@@ -1,0 +1,16 @@
+Bootstrap: docker
+From: "${CONFIG_SERVICES_INFLUXDB_VERSION}"
+
+%files
+  setup.sh /setup.sh
+
+%post
+  usermod -u 0 root
+  chmod 0755 /setup.sh
+  echo 'log-level: debug' >> /etc/defaults/influxdb2/config.yml
+
+%runscript
+  exec "/setup.sh" "$@"
+
+%startscript
+  /setup.sh

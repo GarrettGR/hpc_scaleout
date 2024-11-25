@@ -1,0 +1,26 @@
+Bootstrap: docker
+From: treydock/ood:latest
+
+%setup
+  mkdir -p /usr/local/bin/
+
+%files
+  ood_portal.yml /etc/ood/config/ood_portal.yml
+  scaleout.yaml /etc/ood/config/clusters.d/scaleout.yml
+  entrypoint.sh /entrypoint.sh
+  sbatch /usr/local/bin/sbatch
+  scancel /usr/local/bin/scancel
+  scontrol /usr/local/bin/scontrol
+  squeue /usr/local/bin/squeue
+
+%post
+  /opt/ood/ood-portal-generator/sbin/update_ood_portal
+  chmod 0755 /entrypoint.sh
+  chmod 0755 /usr/local/bin/{sbatch,scancel,scontrol,squeue}
+  mkdir -m 0777 -p /var/www/ood/apps/sys/dashboard/log/
+
+%runscript
+  exec "/entrypoint.sh" "$@"
+
+%startscript
+  /entrypoint.sh

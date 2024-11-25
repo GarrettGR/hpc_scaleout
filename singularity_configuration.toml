@@ -1,0 +1,88 @@
+[cluster]
+name = "cluster"
+resource_name = "scaleout"
+compute_node_count = 10
+compute_node_core_count = 10
+# domain = "example.com"
+subnet = "10.11"
+subnet6 = "2001:db8:1:1"
+
+[storage]
+home_directory = "/hpc_shared/home"
+scratch_directory = "/hpc/shared/scratch"
+
+[services]
+
+[services.grafana]
+enabled = true
+# version = "9.5.3"
+port = 3000
+credentials = [{ username = "admin", password = "password" }]
+
+[services.rest]
+enabled = true
+port = 8080
+
+[services.sql]
+enabled = true
+version = "8.0.23"
+credentials = [{ username = "admin", password = "password" }]
+
+[services.elastic_search]
+enabled = true
+version = "7.10.1"
+port = 9200
+
+[services.kibana]
+enabled = true
+version = "7.10.1"
+
+[services.influxdb]
+enabled = true
+version = 2.0
+port = 8086
+credentials = [{ username = "user", password = "password" },
+               { username = "admin", password = "" }]
+
+[services.open_ondemand]
+enabled = true
+# version = "3.0.1"
+port = 8081
+# usernames / users ??
+group = "ood_access"  # Will this work??
+password = "password"
+
+[services.xdmod]
+enabled = true
+version = "10.5.0" # ??
+port = 8082
+
+[services.proxy]
+enabled = true
+rest_api_auth = "/auth"
+rest_api_query = "/slurm/"
+
+
+[[users]]
+name = "admin"
+password = "admin_secure_password"
+ssh_key = "ssh-rsa AAAA..."
+groups = ["admin", "sudo"]
+shell = "/bin/bash"
+home_directory = "/home/admin"
+
+[[users]]
+name = "developer"
+password = "dev_secure_password"
+ssh_key = "ssh-rsa BBBB..."
+groups = ["developer"]
+shell = "/bin/bash"
+home_directory = "/home/developer"
+
+[[users]]
+name = "monitoring"
+password = "monitor_secure_password"
+ssh_key = "ssh-rsa CCCC..."
+groups = ["monitoring"]
+shell = "/bin/bash"
+home_directory = "/home/monitoring"

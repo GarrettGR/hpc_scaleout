@@ -1,0 +1,55 @@
+#!/bin/bash
+#exec 1> >(logger -s -t influxdb-setup) 2>&1
+
+function pingit{
+	influx v1 auth list 1>&2
+	echo $?
+}
+
+#wait until the daemon is responding
+while [ $(pingit) != 0 ]; do
+	sleep 0.1
+done
+
+sleep 2
+
+B=$(while true; do
+	influx bucket list 2>/dev/null >/tmp/buckets
+	B=$(awk '
+	BEGIN { rc = 1 }
+	/'"${CONFIG_CLUSTER_RESOURCE_NAME}"'/ {
+		if (length($1) > 5 && $1 !~ /Error/) {
+			print $1; rc = 0
+		}
+	}
+	END {exit rc}
+	' </tmp/buckets)
+	[ $? -eq 0 ] && echo "$B" && break
+	sleep 0.1
+done)
+
+echo "Found bucket: $B"
+
+influx v1 dbrp create \
+	--db "${CONFIG_CLUSTER_RESOURCE_NAME}" \
+  --rp "${CONFIG_CLUSTER_RESOURCE_NAME}" \
+	--bucket-id $B \
+	--default
+
+influx v1 auth create \
+	-c default \
+	-d "slurm user" \
+	--org "${CONFIG_CLUSTER_RESOURCE_NAME}" \
+	--password "${CONFIG_SERVICES_INFLUXDB_CREDENTIALS_0_PASSWORD}" \
+	--username "${CONFIG_SERVICES_INFLUXDB_CREDENTIALS_0_USERNAME}" \
+	--write-bucket $B \
+	--read-bucket $B
+
+influx v1 auth create \
+	-c default \
+	-d "slurm user" \
+	--org "${CONFIG_CLUSTER_RESOURCE_NAME}" \
+	--no-password \
+	--username "${CONFIG_SERVICES_INFLUXDB_CREDENTIALS_1_USERNAME}" \
+	--write-bucket $B \
+	--read-bucket $B

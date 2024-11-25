@@ -1,0 +1,21 @@
+Bootstrap: docker
+From: tools-ext-01.ccr.xdmod.org/xdmod-"${CONFIG_SERVICES_XDMOD_VERSION}"-x86_64:rockylinux8.5-0.3
+
+%files
+  resources.json /etc/xdmod/resources.json2
+  resource_specs.json /etc/xdmod/resource_specs.json2
+  startup.sh /sbin/startup.sh
+
+%post
+  yum update --exclude google-chrome-* -y
+  yum upgrade --exclude google-chrome-* -y
+  systemctl enable postfix.service mariadb.service httpd.service
+  sed -e 's#:443#:80#' -e 's#SSLEngine on#SSLEngine off#g' -i /etc/httpd/conf.d/xdmod.conf
+  jq -s '.[0] + .[1]' /etc/xdmod/resources.json2 /etc/xdmod/resources.json > /tmp/a; cat /tmp/a > /etc/xdmod/resources.json
+  jq -s '.[0] + .[1]' /etc/xdmod/resource_specs.json2 /etc/xdmod/resource_specs.json > /tmp/a; cat /tmp/a > /etc/xdmod/resource_specs.json
+
+%runscript
+  exec /sbin/startup.sh "$@"
+
+%startscript
+  /sbin/startup.sh

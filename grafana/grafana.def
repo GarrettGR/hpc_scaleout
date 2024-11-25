@@ -1,0 +1,18 @@
+Bootstrap: docker
+From: grafana/grafana:latest
+
+%files
+  grafana.ini /etc/grafana/grafana.ini
+  influxdb.yaml /etc/grafana/provisioning/datasources/influxdb.yaml
+  dashboards.yaml /etc/grafana/provisioning/dashboards/dashboards.yaml
+
+%post
+  apk add wget
+  mkdir -p /var/lib/grafana/dashboards
+  wget 'https://grafana.com/api/dashboards/11057/revisions/1/download' -O /var/lib/grafana/dashboards/11057.json
+
+%runscript
+  exec "/usr/sbin/grafana-server" "$@"
+
+%startscript
+  /usr/sbin/grafana-server

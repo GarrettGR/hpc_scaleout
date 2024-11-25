@@ -1,0 +1,24 @@
+Bootstrap: docker
+From: alpine
+
+%setup
+  mkdir -p /run/nginx /var/www/html/validate /var/www/html/auth
+  mkdir -p /var/www/html/slurm
+
+%files
+  validate.php /var/www/html/validate/index.php
+  auth.php /var/www/html/auth/index.php
+
+%post
+  apk update
+  apk add nginx php83 php83-fpm bash php83-session nginx-debug
+  unlink /etc/nginx/http.d/default.conf
+  chmod 0755 /var/www/html/validate/index.php /var/www/html/auth/index.php
+  echo "daemon off;" >> /etc/nginx/nginx.conf
+  echo "error_log syslog:server=unix:/dev/log,nohostname,tag=nginx debug;" >> /etc/nginx/nginx.conf
+
+%startscript
+  /usr/sbin/nginx & /usr/sbin/php-fpm83 -F & wait
+
+%runscript
+  exec "$@"

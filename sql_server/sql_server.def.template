@@ -1,0 +1,12 @@
+Bootstrap: docker
+From: mysql:"${CONFIG_SERVICES_SQL_VERSION}"
+
+%files
+    root.my.cnf /root/.my.cnf
+
+%runscript
+    # Start the MySQL server ??
+    mysqld
+
+%test
+    mysql --version

@@ -1,0 +1,8 @@
+[client]
+user="${CONFIG_SERVICES_SQL_CREDENTIALS_0_USERNAME}"
+password="${CONFIG_SERVICES_SQL_CREDENTIALS_0_PASSWORD}"
+socket=/run/mysqld/mysqld.sock
+
+[mysql]
+no-auto-rehash
+connect_timeout=2
